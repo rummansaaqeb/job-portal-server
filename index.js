@@ -48,11 +48,25 @@ async function run() {
 
 
         // job application apis
+        // get all data, get one data, get some data [0, 1, many]
 
         app.get('/job-application', async (req, res) => {
             const email = req.query.email;
             const query = { applicant_email: email };
             const result = await jobApplicationCollection.find(query).toArray();
+
+            // not the best way to aggregate 
+
+            for (const application of result) {
+                const query1 = { _id: new ObjectId(application.job_id) }
+                const job = await jobsCollection.findOne(query1);
+                if (job) {
+                    application.title = job.title;
+                    application.company = job.company;
+                    application.company_logo = job.company_logo;
+                }
+            }
+
             res.send(result);
         })
 
