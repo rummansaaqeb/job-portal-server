@@ -33,8 +33,15 @@ async function run() {
         const jobsCollection = client.db('jobPortal').collection('jobs');
         const jobApplicationCollection = client.db('jobPortal').collection('job_applications');
 
+        // Jobs Related Apis
         app.get('/jobs', async (req, res) => {
-            const cursor = jobsCollection.find();
+            const email = req.query.email;
+            let query = {};
+            if (email) {
+                query = {hr_email: email}
+            }
+
+            const cursor = jobsCollection.find(query);
             const result = await cursor.toArray();
             res.send(result);
         })
@@ -43,6 +50,12 @@ async function run() {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) };
             const result = await jobsCollection.findOne(query);
+            res.send(result);
+        })
+
+        app.post('/jobs', async (req, res) => {
+            const newJob = req.body;
+            const result = await jobsCollection.insertOne(newJob);
             res.send(result);
         })
 
@@ -62,6 +75,7 @@ async function run() {
                 const job = await jobsCollection.findOne(query1);
                 if (job) {
                     application.title = job.title;
+                    application.location = job.location;
                     application.company = job.company;
                     application.company_logo = job.company_logo;
                 }
@@ -75,6 +89,7 @@ async function run() {
             const result = await jobApplicationCollection.insertOne(application);
             res.send(result);
         })
+
 
     } finally {
         // Ensures that the client will close when you finish/error
