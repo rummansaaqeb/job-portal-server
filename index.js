@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 const app = express();
 require('dotenv').config()
 const port = process.env.PORT || 5000;
@@ -32,6 +33,19 @@ async function run() {
 
         const jobsCollection = client.db('jobPortal').collection('jobs');
         const jobApplicationCollection = client.db('jobPortal').collection('job_applications');
+
+
+        // Auth Related APIs
+
+        app.post('/jwt', async(req, res) => {
+            const user = req.body;
+            const token = jwt.sign(user, 'secret', {expiresIn: '1h'});
+            res.send(token);
+        })
+
+
+
+
 
         // Jobs Related Apis
         app.get('/jobs', async (req, res) => {
@@ -125,7 +139,7 @@ async function run() {
         app.patch('/job-applications/:id', async (req, res) => {
             const id = req.params.id;
             const data = req.body;
-            const filter = {_id: new ObjectId(id)};
+            const filter = { _id: new ObjectId(id) };
             const updatedDoc = {
                 $set: {
                     status: data.status,
