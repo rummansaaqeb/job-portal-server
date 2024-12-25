@@ -18,7 +18,7 @@
  }));
 
  in the client side:
- 
+ use axios, get , post, delete, patch for secure apis and must use: withCredentials: true
  
  * 
  * 

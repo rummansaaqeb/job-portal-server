@@ -44,13 +44,13 @@ async function run() {
 
         app.post('/jwt', async (req, res) => {
             const user = req.body;
-            const token = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: '1h' });
-            res.cookie('token', token, {
-                httpOnly: true,
-                secure: false, // http://localhost:5000/
-
-
-            }).send({ success: true });
+            const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '5h' });
+            res
+                .cookie('token', token, {
+                    httpOnly: true,
+                    secure: false,
+                })
+                .send({ success: true })
         })
 
 
@@ -91,7 +91,7 @@ async function run() {
             const email = req.query.email;
             const query = { applicant_email: email };
 
-            console.log('cookies', req.cookies);
+            console.log('cukuckucku', req.cookies);
 
             const result = await jobApplicationCollection.find(query).toArray();
 
