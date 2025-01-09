@@ -29,7 +29,7 @@ const verifyToken = (req, res, next) => {
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
         if (err) {
-            return res.status(401).send({message: "Unauthorized access"})
+            return res.status(401).send({ message: "Unauthorized access" })
         }
 
         req.user = decoded;
@@ -95,14 +95,20 @@ async function run() {
 
         // Jobs Related Apis
         app.get('/jobs', logger, async (req, res) => {
-            console.log('now inside the other api callback')
             const email = req.query.email;
+            const sort = req.query?.sort;
             let query = {};
+            let sortQuery = {};
+
             if (email) {
                 query = { hr_email: email }
             }
 
-            const cursor = jobsCollection.find(query);
+            if (sort == 'true') {
+                sortQuery = { "salaryRange.min": -1 }
+            }
+
+            const cursor = jobsCollection.find(query).sort(sortQuery);
             const result = await cursor.toArray();
             res.send(result);
         })
@@ -127,8 +133,8 @@ async function run() {
         app.get('/job-application', verifyToken, async (req, res) => {
             const email = req.query.email;
 
-            if(req.user.email !== req.query.email){ //token email !== query email
-                return res.status(403).send({message: 'forbidden access'});
+            if (req.user.email !== req.query.email) { //token email !== query email
+                return res.status(403).send({ message: 'forbidden access' });
             }
 
             const query = { applicant_email: email };
